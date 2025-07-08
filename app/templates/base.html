@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>운동 메이트</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  {% if show_navbar %}
+  <nav class="bg-white shadow p-4">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <a href="/" class="text-xl font-bold">운동 메이트</a>
+  
+      {% if session.get('user_id') %}
+      <div class="space-x-4">
+        <span class="text-gray-600">정글짐은 {{ session['nickname'] }}님을 환영합니다.</span>
+        <a href="/post/create" class="text-blue-500 hover:underline">글쓰기</a>
+        <a href="/applications/sent" class="text-blue-500 hover:underline">내가 한 신청</a>
+        <a href="/applications/received" class="text-blue-500 hover:underline">받은 신청</a>
+        <a href="/logout" class="text-red-500 hover:underline">로그아웃</a>
+      </div>
+      {% else %}
+      <div class="space-x-4">
+        <a href="/login" class="text-blue-500 hover:underline">로그인</a>
+        <a href="/signup" class="text-green-500 hover:underline">회원가입</a>
+      </div>
+      {% endif %}
+    </div>
+  </nav>
+  {% endif %}
+  
+
+  <!-- 💡 여기에 블록 추가 -->
+  <main class="max-w-5xl mx-auto mt-6 px-4">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+</body>
+</html>

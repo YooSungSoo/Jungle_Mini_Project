@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto mt-10 px-4">
+  <h1 class="text-3xl font-bold text-center mb-8">운동 메이트 모집 게시판</h1>
+
+  {% if posts %}
+    <div class="space-y-6">
+      {% for post in posts %}
+      <div class="bg-white p-6 rounded-lg shadow border">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-xl font-semibold">{{ post.title }}</h2>
+          <p class="text-sm text-gray-500">작성자: {{ post.author_nickname }}</p>
+        </div>
+
+        <p class="text-gray-700 mb-3">{{ post.content }}</p>
+
+        <div class="text-sm text-gray-600 space-y-1 mb-4">
+          <p>운동 종류: {{ post.category }}</p>
+          <p>일시: {{ post.date }} {{ post.time }}</p>
+          <p>모집 인원: {{ post.current_people }} / {{ post.max_people }}</p>
+        </div>
+
+        {% if user_id and post.author_id|string == user_id %}
+        <div class="flex space-x-2">
+          <a href="/post/{{ post._id }}/edit" class="text-blue-500 hover:underline">수정</a>
+          <a href="/post/{{ post._id }}/delete" class="text-red-500 hover:underline"
+            onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+        </div>
+        {% endif %}
+
+        {% if user_id and post.author_id|string != user_id %}
+        <form action="/post/{{ post._id }}/apply" method="POST" class="mt-2">
+          <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+            지원하기
+          </button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center text-gray-500">현재 모집 중인 글이 없습니다.</p>
+  {% endif %}
+</div>
+{% endblock %}
