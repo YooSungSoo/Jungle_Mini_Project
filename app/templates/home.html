@@ -34,6 +34,12 @@
         <p>운동 종류: {{ post.category }}</p>
         <p>일시: {{ post.date }} {{ post.time }}</p>
         <p>모집 인원: {{ post.current_people }} / {{ post.max_people }}</p>
+
+        <button onclick="document.getElementById('modal-{{ post._id }}').classList.remove('hidden')" 
+                class="text-gray-500 hover:text-green-600 text-sm inline-flex items-center space-x-1">
+          <span class="text-lg">🗒️</span>
+          <span>{{ post.comments|length }}</span>
+        </button>
       </div>
 
       {% if user_id and post.author_id|string == user_id %}
@@ -62,6 +68,32 @@
       {% elif post.current_people >= post.max_people %}
       <p class="text-green-500 font-semibold mt-2">모집 마감되었습니다.</p>
       {% endif %}
+    </div>
+
+    <!-- 댓글 모달 -->
+    <div id="modal-{{ post._id }}" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg w-11/12 max-w-lg p-6 relative">
+        <button onclick="document.getElementById('modal-{{ post._id }}').classList.add('hidden')"
+                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+        <h3 class="text-lg font-semibold mb-4">댓글</h3>
+
+        <div class="max-h-64 overflow-y-auto mb-4 text-sm text-gray-700 space-y-3">
+          {% for c in post.comments %}
+          <div><strong>{{ c.nickname }}</strong> - {{ c.created_at.strftime('%Y-%m-%d %H:%M') }}<br>{{ c.content }}</div>
+          {% else %}
+          <p class="text-gray-400">댓글이 없습니다.</p>
+          {% endfor %}
+        </div>
+
+        {% if user_id %}
+        <form method="POST" action="/post/{{ post._id }}/comment">
+          <textarea name="comment" rows="3" class="w-full border rounded p-2 mb-2 text-sm" placeholder="댓글을 입력하세요..." required></textarea>
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">등록</button>
+        </form>
+        {% else %}
+        <p class="text-red-500 text-sm mt-2">로그인 후 댓글을 작성할 수 있습니다.</p>
+        {% endif %}
+      </div>
     </div>
     {% endfor %}
   </div>
