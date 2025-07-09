@@ -5,6 +5,7 @@
   <title>운동 메이트</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <script>
@@ -12,6 +13,7 @@
     </script>
   {% endif %}
 {% endwith %}
+
 <body class="bg-gray-100 font-sans">
   {% if show_navbar %}
   <nav class="bg-white shadow p-4">
@@ -20,10 +22,10 @@
         <img src="{{ url_for('static', filename='logo.png') }}" alt="정글짐 로고" class="h-16 max-h-20 -my-2" />
         <h1 class="text-3xl font-bold text-center px-3 py-1 rounded transition">정글GYM</h1>
       </a>
-      
-      {% if session.get('user_id') %}
+
+      {% if user_id %}
       <div class="space-x-4">
-        <span class="font-bold text-gray-700">Welcome {{ session['nickname'] }}</span>
+        <span class="font-bold text-gray-700">Welcome {{ nickname }}</span>
         <a href="/post/create" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1.5 px-4 rounded">글쓰기</a>
         <a href="/applications/sent" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">보낸 지원</a>
         <a href="/applications/received" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">받은 지원</a>
@@ -38,11 +40,10 @@
     </div>
   </nav>
   {% endif %}
-  
+
   <main class="max-w-5xl mx-auto mt-6 px-4">
     {% block content %}
     {% endblock %}
   </main>
-
 </body>
 </html>

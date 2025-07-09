@@ -1,18 +1,19 @@
-from flask import Blueprint, render_template, session, current_app, redirect
+from flask import Blueprint, render_template, current_app, redirect, request
 from bson.objectid import ObjectId
+from utils import decode_token_from_request
 
 applications_bp = Blueprint('applications', __name__)
 
 @applications_bp.route('/applications/sent')
 def apply_sent():
-    db = current_app.db
-    user_id = session.get('user_id')
-    if not user_id:
+    user = decode_token_from_request()
+    if not user:
         return "로그인이 필요합니다.", 401
 
-    applications = list(db.applications.find({'applicant_id': ObjectId(user_id)})) 
+    db = current_app.db
+    user_id = user['user_id']
 
-
+    applications = list(db.applications.find({'applicant_id': ObjectId(user_id)}))
     post_ids = [app['post_id'] for app in applications]
     posts = db.posts.find({'_id': {'$in': post_ids}})
     post_map = {post['_id']: post for post in posts}
@@ -27,20 +28,21 @@ def apply_sent():
                 'applied_at': app.get('applied_at')
             })
 
-    return render_template('apply_sent.html', applications=enriched_apps, show_navbar=True)
+    return render_template('apply_sent.html', applications=enriched_apps,
+                           user_id=user['user_id'], nickname=user['nickname'], show_navbar=True)
 
 @applications_bp.route('/applications/received')
 def apply_received():
-    db = current_app.db
-    user_id = session.get('user_id')
-    if not user_id:
+    user = decode_token_from_request()
+    if not user:
         return "로그인이 필요합니다.", 401
+
+    db = current_app.db
+    user_id = user['user_id']
 
     posts = list(db.posts.find({'author_id': ObjectId(user_id)}))
     post_ids = [post['_id'] for post in posts]
-
     applications = list(db.applications.find({'post_id': {'$in': post_ids}}))
-
     post_map = {post['_id']: post for post in posts}
 
     enriched = []
@@ -55,12 +57,16 @@ def apply_received():
                 'status': app.get('status', '대기 중')
             })
 
-    return render_template('apply_received.html', applications=enriched, show_navbar=True)
+    return render_template('apply_received.html', applications=enriched,
+                           user_id=user['user_id'], nickname=user['nickname'], show_navbar=True)
 
 @applications_bp.route('/applications/<application_id>/accept', methods=['POST'])
 def accept_application(application_id):
-    db = current_app.db
+    user = decode_token_from_request()
+    if not user:
+        return "로그인이 필요합니다.", 401
 
+    db = current_app.db
     db.applications.update_one(
         {'_id': ObjectId(application_id)},
         {'$set': {'status': '수락됨'}}
@@ -78,6 +84,10 @@ def accept_application(application_id):
 
 @applications_bp.route('/applications/<application_id>/reject', methods=['POST'])
 def reject_application(application_id):
+    user = decode_token_from_request()
+    if not user:
+        return "로그인이 필요합니다.", 401
+
     db = current_app.db
     db.applications.update_one(
         {'_id': ObjectId(application_id)},
