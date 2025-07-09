@@ -34,6 +34,8 @@
             지원하기
           </button>
         </form>
+          {% elif post.current_people >= post.max_people %}
+            <p class="text-red-500 font-semibold mt-2">모집이 마감되었습니다.</p>
         {% endif %}
       </div>
       {% endfor %}

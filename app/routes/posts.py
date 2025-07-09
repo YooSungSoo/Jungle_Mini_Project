@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session ,request, redirect, current_app
+from flask import Blueprint, render_template, session ,request, redirect, current_app, flash
 from bson.objectid import ObjectId
 from datetime import datetime
 
@@ -94,7 +94,8 @@ def apply_to_post(post_id):
         'applicant_id': ObjectId(user_id)
     })
     if existing:
-        return "이미 신청한 게시물입니다.", 400
+        flash("이미 신청한 게시물입니다")
+        return redirect('/')
 
     application = {
         'post_id': ObjectId(post_id),
@@ -104,6 +105,7 @@ def apply_to_post(post_id):
     }
 
     db.applications.insert_one(application)
+    flash("지원이 완료되었습니다.")
     return redirect('/')
 
 
