@@ -27,14 +27,25 @@ def home():
         .limit(per_page)
     )
 
+    # 댓글 추가 (SSR용)
+    for post in posts:
+        comments = list(db.comments.find({'post_id': post['_id']}).sort('created_at', 1))
+        post['comments'] = comments
+
     categories = ['산책', '러닝', '헬스', '농구']
     user = decode_token_from_request()
     user_id = user['user_id'] if user else None
     nickname = user['nickname'] if user else None
 
-    return render_template('home.html', posts=posts, user_id=user_id, nickname=nickname,
-                           show_navbar=True, current_page=page, total_pages=total_pages,
-                           categories=categories, selected_category=selected_category)
+    return render_template('home.html',
+                           posts=posts,
+                           user_id=user_id,
+                           nickname=nickname,
+                           show_navbar=True,
+                           current_page=page,
+                           total_pages=total_pages,
+                           categories=categories,
+                           selected_category=selected_category)
 
 @posts_bp.route('/post/create', methods=['GET', 'POST'])
 def create_post():
@@ -135,4 +146,45 @@ def apply_to_post(post_id):
 
     db.applications.insert_one(application)
     flash("지원이 완료되었습니다.")
+    return redirect('/')
+
+@posts_bp.route('/post/<post_id>/comment', methods=['POST'])
+def add_comment(post_id):
+    user = decode_token_from_request()
+    if not user:
+        return redirect('/login')
+
+    content = request.form.get('comment')
+    if not content:
+        flash('댓글 내용을 입력해주세요.')
+        return redirect('/')
+
+    db = current_app.db
+    db.comments.insert_one({
+        'post_id': ObjectId(post_id),
+        'nickname': user['nickname'],
+        'content': content,
+        'created_at': datetime.utcnow()
+    })
+
+    return redirect('/')
+
+@posts_bp.route('/comment/<comment_id>/delete', methods=['POST'])
+def delete_comment(comment_id):
+    user = decode_token_from_request()
+    if not user:
+        return redirect('/login')
+
+    db = current_app.db
+    comment = db.comments.find_one({'_id': ObjectId(comment_id)})
+    if not comment:
+        flash("댓글을 찾을 수 없습니다.")
+        return redirect('/')
+
+    if comment['nickname'] != user['nickname']:
+        flash("삭제 권한이 없습니다.")
+        return redirect('/')
+
+    db.comments.delete_one({'_id': ObjectId(comment_id)})
+    flash("댓글이 삭제되었습니다.")
     return redirect('/')

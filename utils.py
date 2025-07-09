@@ -1,7 +1,7 @@
 import jwt
 from flask import request
 
-SECRET_KEY = 'your_jwt_secret_key_here'
+SECRET_KEY = 'junglegym'
 
 def decode_token_from_request():
     token = request.cookies.get('token')

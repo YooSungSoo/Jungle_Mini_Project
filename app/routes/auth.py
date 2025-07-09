@@ -8,8 +8,7 @@ from utils import decode_token_from_request
 
 auth_bp = Blueprint('auth', __name__)
 
-# JWT 시크릿 키 (실제 운영에서는 환경변수로 관리 권장)
-SECRET_KEY = 'your_jwt_secret_key_here'
+SECRET_KEY = 'junglegym'
 
 def create_token(user):
     payload = {
