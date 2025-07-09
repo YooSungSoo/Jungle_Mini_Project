@@ -5,33 +5,40 @@
   <title>운동 메이트</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <script>
+      alert("{{ messages[0] }}");
+    </script>
+  {% endif %}
+{% endwith %}
 <body class="bg-gray-100 font-sans">
-
   {% if show_navbar %}
   <nav class="bg-white shadow p-4">
     <div class="max-w-5xl mx-auto flex justify-between items-center">
-      <a href="/" class="text-xl font-bold">운동 메이트</a>
-  
+      <a href="{% if request.path != '/' %}/{% else %}#{% endif %}" class="flex items-center cursor-pointer">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="정글짐 로고" class="h-16 max-h-20 -my-2" />
+        <h1 class="text-3xl font-bold text-center px-3 py-1 rounded transition">정글GYM</h1>
+      </a>
+      
       {% if session.get('user_id') %}
       <div class="space-x-4">
-        <span class="text-gray-600">정글짐은 {{ session['nickname'] }}님을 환영합니다.</span>
-        <a href="/post/create" class="text-blue-500 hover:underline">글쓰기</a>
-        <a href="/applications/sent" class="text-blue-500 hover:underline">내가 한 신청</a>
-        <a href="/applications/received" class="text-blue-500 hover:underline">받은 신청</a>
-        <a href="/logout" class="text-red-500 hover:underline">로그아웃</a>
+        <span class="font-bold text-gray-700">Welcome {{ session['nickname'] }}</span>
+        <a href="/post/create" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1.5 px-4 rounded">글쓰기</a>
+        <a href="/applications/sent" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">보낸 지원</a>
+        <a href="/applications/received" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">받은 지원</a>
+        <a href="/logout" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">로그아웃</a>
       </div>
       {% else %}
       <div class="space-x-4">
-        <a href="/login" class="text-blue-500 hover:underline">로그인</a>
-        <a href="/signup" class="text-green-500 hover:underline">회원가입</a>
+        <a href="/login" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">로그인</a>
+        <a href="/signup" class="text-gray-700 font-bold hover:text-green-600 px-3 py-1 rounded transition">회원가입</a>
       </div>
       {% endif %}
     </div>
   </nav>
   {% endif %}
   
-
-  <!-- 💡 여기에 블록 추가 -->
   <main class="max-w-5xl mx-auto mt-6 px-4">
     {% block content %}
     {% endblock %}

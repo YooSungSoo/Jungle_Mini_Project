@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session ,request, redirect, current_app
+from flask import Blueprint, render_template, session ,request, redirect, current_app, flash
 from bson.objectid import ObjectId
 from datetime import datetime
 
@@ -8,11 +8,42 @@ posts_bp = Blueprint('posts', __name__)
 @posts_bp.route('/')
 def home():
     db = current_app.db
-    posts = list(db.posts.find())
-    user_id = session.get('user_id')
-    nickname = session.get('nickname')
 
-    return render_template('home.html', posts=posts, user_id=user_id, nickname=nickname, show_navbar=True)
+    selected_category = request.args.get('category')  # 예: category=헬스
+
+    page = int(request.args.get('page', 1))
+    per_page = 6
+    skip = (page - 1) * per_page
+
+    query = {}
+    if selected_category:
+        query['category'] = selected_category
+
+    total_count = db.posts.count_documents(query)
+    total_pages = (total_count + per_page - 1) // per_page
+
+    posts = list(
+        db.posts.find(query)
+        .sort('created_at', -1)
+        .skip(skip)
+        .limit(per_page)
+    )
+
+    categories = ['산책', '러닝', '헬스', '농구']
+
+    return render_template(
+        'home.html',
+        posts=posts,
+        user_id=session.get('user_id'),
+        nickname=session.get('nickname'),
+        show_navbar=True,
+        current_page=page,
+        total_pages=total_pages,
+        categories=categories,
+        selected_category=selected_category
+    )
+
+
 
 
 @posts_bp.route('/post/create', methods=['GET', 'POST'])
@@ -94,7 +125,8 @@ def apply_to_post(post_id):
         'applicant_id': ObjectId(user_id)
     })
     if existing:
-        return "이미 신청한 게시물입니다.", 400
+        flash("이미 신청한 게시물입니다")
+        return redirect('/')
 
     application = {
         'post_id': ObjectId(post_id),
@@ -104,6 +136,7 @@ def apply_to_post(post_id):
     }
 
     db.applications.insert_one(application)
+    flash("지원이 완료되었습니다.")
     return redirect('/')
 
 

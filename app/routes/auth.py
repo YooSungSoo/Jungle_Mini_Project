@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session, current_app
+from flask import Blueprint, render_template, request, redirect, session, current_app, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
 
@@ -12,9 +12,15 @@ def signup():
         nickname = request.form['nickname']
         password = request.form['password']
 
+        existing_nickname = db.users.find_one({'nickname': nickname})
+        if existing_nickname:
+            flash("이미 존재하는 닉네임입니다.")
+            return redirect('/login')
+
         existing_user = db.users.find_one({'email': email})
         if existing_user:
-            return '이미 존재하는 이메일입니다.'
+            flash("이미 존재하는 이메일입니다.")
+            return redirect('/login')
 
         hashed_pw = generate_password_hash(password) 
         db.users.insert_one({
@@ -35,12 +41,13 @@ def login():
 
         user = db.users.find_one({'email': email})
         if not user:
-            return '이메일이 존재하지 않습니다.'
+            flash("이메일이 존재하지 않습니다.")
+            return redirect('/login')
 
         if not check_password_hash(user['password'], password):
-            return '비밀번호가 일치하지 않습니다.'
+            flash("비밀번호가 일치하지 않습니다.")
+            return redirect('/login')
 
-        # 로그인 성공 → 세션 저장
         session['user_id'] = str(user['_id'])
         session['nickname'] = user['nickname']
         return redirect('/')
