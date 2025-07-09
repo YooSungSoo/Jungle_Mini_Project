@@ -23,6 +23,7 @@ def apply_sent():
         post = post_map.get(app['post_id'])
         if post:
             enriched_apps.append({
+                'application_id': str(app['_id']),
                 'post': post,
                 'status': app.get('status', '대기 중'),
                 'applied_at': app.get('applied_at')
@@ -94,3 +95,21 @@ def reject_application(application_id):
         {'$set': {'status': '거절됨'}}
     )
     return redirect('/applications/received')
+
+@applications_bp.route('/applications/<application_id>/cancel', methods=['POST'])
+def cancel_application(application_id):
+    user = decode_token_from_request()
+    if not user:
+        return redirect('/login')
+
+    db = current_app.db
+    app_doc = db.applications.find_one({'_id': ObjectId(application_id)})
+
+    if not app_doc:
+        return "신청 정보가 존재하지 않습니다.", 404
+
+    if str(app_doc['applicant_id']) != user['user_id']:
+        return "본인의 신청만 취소할 수 있습니다.", 403
+
+    db.applications.delete_one({'_id': ObjectId(application_id)})
+    return redirect('/applications/sent')
