@@ -12,7 +12,7 @@ def signup():
         nickname = request.form['nickname']
         password = request.form['password']
 
-        existing_nickname = db.nickname.find_one({'nickname': nickname})
+        existing_nickname = db.users.find_one({'nickname': nickname})
         if existing_nickname:
             flash("이미 존재하는 닉네임입니다.")
             return redirect('/login')
