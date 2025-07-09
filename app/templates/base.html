@@ -23,7 +23,7 @@
       {% if session.get('user_id') %}
       <div class="space-x-4">
         <span class="text-gray-600">정글짐은 {{ session['nickname'] }}님을 환영합니다.</span>
-        <a class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1.5 px-4 rounded">글쓰기</a>
+        <a href="/post/create" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1.5 px-4 rounded">글쓰기</a>
         <a href="/applications/sent" class="text-gray-700 hover:text-green-600 px-3 py-1 rounded transition">내가 한 신청</a>
         <a href="/applications/received" class="text-gray-700 hover:text-green-600 px-3 py-1 rounded transition">받은 신청</a>
         <a href="/logout" class="text-gray-700 hover:text-green-600 px-3 py-1 rounded transition">로그아웃</a>
