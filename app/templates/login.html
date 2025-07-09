@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <div class="flex justify-center items-center h-screen">
   <form method="POST" class="bg-white p-8 rounded-lg shadow-md w-96">
-    <h2 class="text-2xl font-bold mb-6 text-center">로그인</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center">정글GYM 로그인</h2>
 
     <label class="block mb-2 text-sm font-medium text-gray-700">이메일</label>
     <input
@@ -21,14 +21,14 @@
 
     <button
       type="submit"
-      class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+      class="w-full bg-green-500 text-white py-2 rounded font-bold transition"
     >
       로그인
     </button>
 
     <p class="text-sm text-center mt-4 text-gray-600">
-      계정이 없으신가요?
-      <a href="/signup" class="text-blue-500 hover:underline">회원가입</a>
+      정글GYM 계정이 없으시다면 ->
+      <a href="/signup" class="text-blue-500 font-bold hover:underline">회원가입</a>
     </p>
   </form>
 </div>
