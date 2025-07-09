@@ -10,7 +10,7 @@ def apply_sent():
     if not user_id:
         return "로그인이 필요합니다.", 401
 
-    applications = list(db.applications.find({'applicant_id': ObjectId(user_id)}))  # ✅ 수정된 코드
+    applications = list(db.applications.find({'applicant_id': ObjectId(user_id)})) 
 
 
     post_ids = [app['post_id'] for app in applications]
